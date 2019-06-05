@@ -1,6 +1,5 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class QAP {
 
@@ -50,6 +49,16 @@ public class QAP {
         return fitness;
     }
 
+    public int calculateFitness(ArrayList<Integer> positions) {
+        int fitness = 0;
+        for (int i = 0; i < this.taillardParser.getSize(); i++) {
+            for (int j = i + 1; j < this.taillardParser.getSize(); j++) {
+                fitness += weightMatrix[i][j] * distanceMatrix[positions.get(i)][positions.get(j)];
+            }
+        }
+        return fitness;
+    }
+
     public int[] simulatedAnnealing(double tk, double coolingDown) {
         // voisinage : permutation de 2 positions
         int n1 = 50000;
@@ -91,14 +100,14 @@ public class QAP {
         ArrayList<int[]> tabouList = new ArrayList<>();
         int[][][] neighboorhood;
         int[] positionsTemp = this.positions.clone();
-        int fitnessX = Integer.MAX_VALUE;
+        int fitnessX;
         int fitness;
         int delta;
         int[] permutation = new int[2];
 
         for (int i = 0; i < maxIter; i++) {
             fitnessX = Integer.MAX_VALUE;
-            neighboorhood = this.getNeighboorhood(positionsX);
+            neighboorhood = this.getNeighborhood(positionsX);
             // on retire les élements de la liste Tabou du voisinage
             for (int j = 0; j < tabouList.size(); j++) {
                 System.out.println(tabouList.get(0)[0] + " " + tabouList.get(0)[1]);
@@ -152,6 +161,40 @@ public class QAP {
         return positionsMin;
     }
 
+    public QAPSolution tabuSearchBis(int tabuSize, int maxIter) {
+        QAPSolution bestSolution = new QAPSolution(this.taillardParser.getSize());
+        int bestFitness = calculateFitness(bestSolution);
+        int candidateFitness;
+        ArrayList<Permutation> tabuList = new ArrayList<>();
+        ArrayList<Map.Entry<Permutation, QAPSolution>> candidateList = new ArrayList<>();
+        Map.Entry<Permutation, QAPSolution> candidateSolution;
+
+        int iterations = 0;
+        while (iterations < maxIter) {
+            candidateList.clear();
+
+            for(Map.Entry<Permutation, QAPSolution> candidate : this.getNeighborhood(bestSolution).entrySet()) {
+                if (!tabuList.contains(candidate.getKey())) {
+                    candidateList.add(candidate);
+                }
+            }
+
+            candidateSolution = getBestCandidate(candidateList);
+
+            if ((candidateFitness = calculateFitness(candidateSolution.getValue())) < bestFitness) {
+                bestFitness = candidateFitness;
+                bestSolution = candidateSolution.getValue();
+                tabuList.add(candidateSolution.getKey());
+                while (tabuList.size() > tabuSize) {
+                    tabuList.remove(0);
+                }
+            }
+            iterations++;
+        }
+
+        return bestSolution;
+    }
+
     public int[] permuteRandom() {
         int[] positionsTemp = positions;
         Random rand = new Random();
@@ -167,7 +210,7 @@ public class QAP {
         return positionsTemp;
     }
 
-    public int[][][] getNeighboorhood(int[] positionsX) {
+    public int[][][] getNeighborhood(int[] positionsX) {
         int taillardParserSize = this.taillardParser.getSize();
         int[][][] neighboorhood = new int[taillardParserSize][taillardParserSize][taillardParserSize];
         int temp;
@@ -182,8 +225,34 @@ public class QAP {
         return neighboorhood;
     }
 
-    public int[] getPositions() {
-        return positions;
+    public HashMap<Permutation, QAPSolution> getNeighborhood(QAPSolution currentSolution) {
+        int solutionSize = currentSolution.size();
+        HashMap<Permutation, QAPSolution> neighboorhood = new HashMap<>();
+        QAPSolution neighboor;
+        for (int i = 0; i < solutionSize; i++) {
+            for (int j = i+1; j < solutionSize; j++) {
+                neighboor = (QAPSolution) currentSolution.clone();
+                Collections.swap(neighboor, i, j);
+                neighboorhood.put(new Permutation(i, j), neighboor);
+            }
+        }
+        return neighboorhood;
     }
+
+    public Map.Entry<Permutation, QAPSolution> getBestCandidate(ArrayList<Map.Entry<Permutation, QAPSolution>> candidateList) {
+        Map.Entry<Permutation, QAPSolution> bestCandidate = null;
+        int bestFitness = Integer.MAX_VALUE;
+        int candidateFitness;
+
+        for (Map.Entry<Permutation, QAPSolution> candidate : candidateList) {
+            if ((candidateFitness = calculateFitness(candidate.getValue())) < bestFitness) {
+                bestFitness = candidateFitness;
+                bestCandidate = candidate;
+            }
+        }
+
+        return bestCandidate;
+    }
+
 
 }
