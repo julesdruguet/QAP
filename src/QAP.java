@@ -5,38 +5,14 @@ public class QAP {
 
     private int[][] distanceMatrix;
     private int[][] weightMatrix;
-    //private int[] positions = {7,0,5,1,10,9,2,4,8,6,11,3};
     private int[] positions = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
     private TaillardParser taillardParser;
 
     public QAP() {
         this.taillardParser = new TaillardParser(new File("taillard/tai12a.dat"));
         taillardParser.parseSize();
-        //this.positions = new int[taillardParser.getSize()];
         weightMatrix = taillardParser.parseMatrix();
         distanceMatrix = taillardParser.parseMatrix();
-
-        /*
-        for (int i = 0; i < this.taillardParser.getSize(); i++) {
-            this.positions[i] = i;
-        }
-        */
-        /*
-        System.out.println("Poids : ");
-        for (int i = 0; i < this.taillardParser.getSize(); i++) {
-            for( int j = 0; j < this.taillardParser.getSize(); j++) {
-                System.out.print(weightMatrix[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("Distances : ");
-        for (int i = 0; i < this.taillardParser.getSize(); i++) {
-            for( int j = 0; j < this.taillardParser.getSize(); j++) {
-                System.out.print(distanceMatrix[i][j] + " ");
-            }
-            System.out.println();
-        }
-        */
     }
 
     public int calculateFitness(int[] positions) {
@@ -173,7 +149,7 @@ public class QAP {
         while (iterations < maxIter) {
             candidateList.clear();
 
-            for(Map.Entry<Permutation, QAPSolution> candidate : this.getNeighborhood(bestSolution).entrySet()) {
+            for (Map.Entry<Permutation, QAPSolution> candidate : this.getNeighborhood(bestSolution).entrySet()) {
                 if (!tabuList.contains(candidate.getKey())) {
                     candidateList.add(candidate);
                 }
@@ -186,11 +162,15 @@ public class QAP {
                 bestSolution = candidateSolution.getValue();
                 tabuList.add(candidateSolution.getKey());
                 while (tabuList.size() > tabuSize) {
+                    //System.out.println("Liste tabou pleine, on retire la permutation suivante :");
+                    //System.out.println(tabuList.get(0));
                     tabuList.remove(0);
                 }
             }
             iterations++;
         }
+        System.out.println("Liste tabou finale :");
+        System.out.println(Arrays.toString(tabuList.toArray()));
 
         return bestSolution;
     }
@@ -227,16 +207,18 @@ public class QAP {
 
     public HashMap<Permutation, QAPSolution> getNeighborhood(QAPSolution currentSolution) {
         int solutionSize = currentSolution.size();
-        HashMap<Permutation, QAPSolution> neighboorhood = new HashMap<>();
-        QAPSolution neighboor;
+        HashMap<Permutation, QAPSolution> neighbourhood = new HashMap<>();
+        QAPSolution neighbour;
         for (int i = 0; i < solutionSize; i++) {
-            for (int j = i+1; j < solutionSize; j++) {
-                neighboor = (QAPSolution) currentSolution.clone();
-                Collections.swap(neighboor, i, j);
-                neighboorhood.put(new Permutation(i, j), neighboor);
+            for (int j = i + 1; j < solutionSize; j++) {
+                if (distanceMatrix[i][j] < 20) {
+                    neighbour = (QAPSolution) currentSolution.clone();
+                    Collections.swap(neighbour, i, j);
+                    neighbourhood.put(new Permutation(i, j), neighbour);
+                }
             }
         }
-        return neighboorhood;
+        return neighbourhood;
     }
 
     public Map.Entry<Permutation, QAPSolution> getBestCandidate(ArrayList<Map.Entry<Permutation, QAPSolution>> candidateList) {
