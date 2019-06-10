@@ -10,7 +10,7 @@ public class Main {
         long durationMs;
 
         ////////// PARTIE RECUIT //////////
-        int[] positionsFinal;
+  /*      int[] positionsFinal;
 
         System.out.println("//////// RECUIT SIMULE ////////\n");
         //// Taillard 12 - Etude 1 ////
@@ -103,20 +103,7 @@ public class Main {
         }
         qap6 = null;
 
-        //// Taillard 60 - Etude 1 ////
-        startTime = System.nanoTime();
-        QAP qap7 = new QAP("tai60a.dat");
-        positionsFinal = qap7.simulatedAnnealing(100,0.95);
-        System.out.println("Taillard 60 - Etude 1\nFitness finale : " + qap7.calculateFitness(positionsFinal));
-        endTime = System.nanoTime();
-        durationMs = (endTime - startTime) / 1000000;
-        if (durationMs < 1000) {
-            System.out.println("Durée d'exécution : " + durationMs + "ms");
-        } else {
-            String time = msToTime(durationMs);
-            System.out.println("Durée d'exécution : " + time);
-        }
-        qap7 = null;
+
 
         //// Taillard 80 - Etude 1 ////
         startTime = System.nanoTime();
@@ -132,11 +119,12 @@ public class Main {
             System.out.println("Durée d'exécution : " + time);
         }
         qap8 = null;
-
+*/
         ////////// PARTIE TABOU //////////
-        /*
+
         startTime = System.nanoTime();
-        QAPSolution positionsFinal = qap.tabuSearchBis(10, 500);
+        QAP qap = new QAP("tai80a.dat");
+        QAPSolution positionsFinal = qap.tabuSearchBis(10, 5000);
 
         System.out.println();
         System.out.println("Positions finales : ");
@@ -149,12 +137,9 @@ public class Main {
         if (durationMs < 1000) {
             System.out.println("Durée d'exécution : " + durationMs + "ms");
         } else {
-            Date d = new Date((durationMs / 1000) * 1000L);
-            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-            String time = df.format(d);
+            String time = msToTime(durationMs);
             System.out.println("Durée d'exécution : " + time);
         }
-        */
 
     }
 

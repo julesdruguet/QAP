@@ -135,6 +135,7 @@ public class QAP {
 
     public QAPSolution tabuSearchBis(int tabuSize, int maxIter) {
         QAPSolution bestSolution = new QAPSolution(this.taillardParser.getSize());
+        QAPSolution currentSolution = bestSolution;
         int bestFitness = calculateFitness(bestSolution);
         int candidateFitness;
         ArrayList<Permutation> tabuList = new ArrayList<>();
@@ -145,7 +146,7 @@ public class QAP {
         while (iterations < maxIter) {
             candidateList.clear();
 
-            for (Map.Entry<Permutation, QAPSolution> candidate : this.getNeighborhood(bestSolution).entrySet()) {
+            for (Map.Entry<Permutation, QAPSolution> candidate : this.getNeighborhood(currentSolution).entrySet()) {
                 if (!tabuList.contains(candidate.getKey())) {
                     candidateList.add(candidate);
                 }
@@ -156,6 +157,8 @@ public class QAP {
             if ((candidateFitness = calculateFitness(candidateSolution.getValue())) < bestFitness) {
                 bestFitness = candidateFitness;
                 bestSolution = candidateSolution.getValue();
+            } else {
+                currentSolution = candidateSolution.getValue();
                 tabuList.add(candidateSolution.getKey());
                 while (tabuList.size() > tabuSize) {
                     //System.out.println("Liste tabou pleine, on retire la permutation suivante :");
@@ -164,10 +167,10 @@ public class QAP {
                 }
             }
             iterations++;
+            if (iterations % 250 == 0) {
+                System.out.println("Itération n°" + iterations + " : fitness de " + bestFitness);
+            }
         }
-/*        System.out.println("Liste tabou finale :");
-        System.out.println(Arrays.toString(tabuList.toArray()));
-*/
 
         return bestSolution;
     }
@@ -208,11 +211,9 @@ public class QAP {
         QAPSolution neighbour;
         for (int i = 0; i < solutionSize; i++) {
             for (int j = i + 1; j < solutionSize; j++) {
-                if (distanceMatrix[i][j] < 20) {
                     neighbour = (QAPSolution) currentSolution.clone();
                     Collections.swap(neighbour, i, j);
                     neighbourhood.put(new Permutation(i, j), neighbour);
-                }
             }
         }
         return neighbourhood;
