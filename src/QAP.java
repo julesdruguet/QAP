@@ -8,8 +8,8 @@ public class QAP {
     private int[] positions = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
     private TaillardParser taillardParser;
 
-    public QAP() {
-        this.taillardParser = new TaillardParser(new File("taillard/tai12a.dat"));
+    public QAP(String fileName) {
+        this.taillardParser = new TaillardParser(new File("taillard/" + fileName));
         taillardParser.parseSize();
         weightMatrix = taillardParser.parseMatrix();
         distanceMatrix = taillardParser.parseMatrix();
@@ -44,7 +44,6 @@ public class QAP {
         int fitnessMin = calculateFitness(positionsMin);
         int[] positionsTemp;
         int delta;
-        System.out.println("Fitness min initiale : " + fitnessMin);
         for (int i = 0; i < n1; i++) {
             for (int j = 1; j < n2; j++) {
                 fitnessX = calculateFitness(this.positions);
@@ -53,7 +52,6 @@ public class QAP {
                 if (delta <= 0) {
                     this.positions = positionsTemp;
                     if (fitnessX < fitnessMin) {
-                        System.out.println(fitnessX);
                         positionsMin = this.positions.clone();
                         fitnessMin = calculateFitness(positionsMin);
                     }
@@ -86,12 +84,10 @@ public class QAP {
             neighboorhood = this.getNeighborhood(positionsX);
             // on retire les élements de la liste Tabou du voisinage
             for (int j = 0; j < tabouList.size(); j++) {
-                System.out.println(tabouList.get(0)[0] + " " + tabouList.get(0)[1]);
                 if (tabouList.get(j) != null) {
                     neighboorhood[tabouList.get(j)[0]][tabouList.get(j)[1]] = null;
                 }
             }
-            System.out.println("______");
 
             for (int j = 0; j < this.taillardParser.getSize(); j++) {
                 for (int k = 0; k < this.taillardParser.getSize(); k++) {
@@ -126,10 +122,6 @@ public class QAP {
             if (fitnessX < fitnessMin) {
                 positionsMin = positionsTemp.clone();
                 fitnessMin = fitnessX;
-                for (int z = 0; z < positionsX.length; z++) {
-                    System.out.print(positionsX[z] + " ; ");
-                }
-                System.out.println();
             }
             positionsX = positionsTemp.clone();
 
@@ -169,8 +161,9 @@ public class QAP {
             }
             iterations++;
         }
-        System.out.println("Liste tabou finale :");
+/*        System.out.println("Liste tabou finale :");
         System.out.println(Arrays.toString(tabuList.toArray()));
+*/
 
         return bestSolution;
     }
