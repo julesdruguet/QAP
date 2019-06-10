@@ -19,7 +19,7 @@ public class TaillardParser {
         int[][] matrix = new int[size][size];
         try {
             for (int i = 0; i < size; i++) {
-                String line = br.readLine().trim().replaceAll(" +", " ");
+                String line = br.readLine().replaceAll("\\s{2,}", " ").trim();
                 String[] str = line.split(" ");
                 for (int j = 0; j < size; j++) {
                     matrix[i][j] = Integer.valueOf(str[j]);

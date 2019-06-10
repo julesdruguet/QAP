@@ -5,7 +5,7 @@ public class QAP {
 
     private int[][] distanceMatrix;
     private int[][] weightMatrix;
-    private int[] positions = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    private int[] positions;
     private TaillardParser taillardParser;
 
     public QAP(String fileName) {
@@ -13,6 +13,10 @@ public class QAP {
         taillardParser.parseSize();
         weightMatrix = taillardParser.parseMatrix();
         distanceMatrix = taillardParser.parseMatrix();
+        positions = new int[taillardParser.getSize()];
+        for (int i = 0; i < taillardParser.getSize(); i++) {
+            positions[i] = i;
+        }
     }
 
     public int calculateFitness(int[] positions) {
